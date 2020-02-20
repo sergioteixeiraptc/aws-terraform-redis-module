@@ -1,5 +1,5 @@
 resource "aws_elasticache_replication_group" "redis" {
-  replication_group_id          = "${format("%.20s", "${var.name}-${var.environment}")}"
+  replication_group_id          = format("%.20s", "${var.name}-${var.environment}")
   replication_group_description = "Terraform managed | ${var.replication_group_description}"
   number_cache_clusters         = var.redis_clusters
   node_type                     = var.redis_node_type
@@ -13,13 +13,13 @@ resource "aws_elasticache_replication_group" "redis" {
   maintenance_window            = var.redis_maintenance_window
   snapshot_window               = var.redis_snapshot_window
   snapshot_retention_limit      = var.redis_snapshot_retention_limit
-  tags                          = "${merge(map("Name", format("terraform-elasticache-%s", var.name)), var.tags)}"
+  tags                          = merge(map("Name", format("terraform-elasticache-%s", var.name)), var.tags)
   snapshot_name                 = var.snapshot_name
 
 }
 
 resource "aws_elasticache_parameter_group" "redis_parameter_group" {
-  name = "${replace(format("%.255s", lower(replace("redis-${var.name}-${var.environment}", "_", "-"))), "/\\s/", "-")}"
+  name = replace(format("%.255s", lower(replace("redis-${var.name}-${var.environment}", "_", "-"))), "/\\s/", "-")
 
   description = "Terraform-managed ElastiCache parameter group for ${var.name}-${var.environment}"
 
@@ -32,12 +32,12 @@ resource "aws_elasticache_parameter_group" "redis_parameter_group" {
 }
 
 resource "aws_elasticache_subnet_group" "redis_subnet_group" {
-  name       = "${replace(format("%.255s", lower(replace("redis-${var.name}-${var.environment}", "_", "-"))), "/\\s/", "-")}"
+  name       = replace(format("%.255s", lower(replace("redis-${var.name}-${var.environment}", "_", "-"))), "/\\s/", "-")
   subnet_ids = var.subnets
 }
 
 resource "aws_security_group" "redis_security_group" {
-  name        = "${format("%.255s", "${var.name}-${var.environment}")}"
+  name        = format("%.255s", "${var.name}-${var.environment}")
   description = "Terraform-managed ElastiCache security group for ${var.name}-${var.environment}"
   vpc_id      = var.vpc_id
 
@@ -47,12 +47,12 @@ resource "aws_security_group" "redis_security_group" {
 }
 
 resource "aws_security_group_rule" "redis_ingress" {
-  count                    = "${length(var.allowed_security_groups)}"
+  count                    = length(var.allowed_security_groups)
   type                     = "ingress"
   from_port                = var.redis_port
   to_port                  = var.redis_port
   protocol                 = "tcp"
-  source_security_group_id = "${element(var.allowed_security_groups, count.index)}"
+  source_security_group_id = element(var.allowed_security_groups, count.index)
   security_group_id        = aws_security_group.redis_security_group.id
 }
 
