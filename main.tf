@@ -1,5 +1,5 @@
 resource "aws_elasticache_replication_group" "redis" {
-  replication_group_id          = format("%.20s", "${var.name}-${var.environment}")
+  replication_group_id          = var.replication_group_id     
   replication_group_description = "Terraform managed | ${var.replication_group_description}"
   number_cache_clusters         = var.redis_clusters
   node_type                     = var.redis_node_type
